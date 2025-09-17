@@ -1,0 +1,33 @@
+body {
+    font-family: 'Be Vietnam Pro', sans-serif;
+}
+.card {
+    background-color: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+.answer-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+.progress-bar-inner {
+    transition: width 0.5s ease-in-out;
+}
+.result-bar {
+    background-image: linear-gradient(to right, #60a5fa, #3b82f6);
+    animation: grow 1s ease-out forwards;
+    transform-origin: left;
+}
+
+@keyframes grow {
+    from { transform: scaleX(0); }
+    to { transform: scaleX(1); }
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.fade-in {
+    animation: fadeIn 0.6s ease-out forwards;
+}

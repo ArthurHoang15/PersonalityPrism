@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài Test Khám Phá Tính Cách CLB</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-gradient-to-br from-sky-200 via-indigo-300 to-blue-400 min-h-screen flex items-center justify-center p-4">
+
+    <main id="container" class="w-full max-w-2xl mx-auto">
+        <!-- Màn hình bắt đầu -->
+        <div id="start-screen" class="card rounded-2xl shadow-2xl p-8 md:p-12 text-center text-slate-800 fade-in">
+            <h1 class="text-3xl md:text-4xl font-bold mb-4 text-blue-700">Khám Phá "Chất" Riêng Của Bạn</h1>
+            <p class="text-slate-600 mb-8 md:text-lg">Bài test này sẽ giúp bạn khám phá tính cách và vai trò phù hợp nhất với mình tại CLB. Hãy trả lời thật tự nhiên nhé!</p>
+            <button id="start-btn" class="bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-bold py-3 px-10 rounded-full shadow-lg hover:shadow-xl hover:from-blue-600 hover:to-indigo-700 transition-all duration-300 transform hover:scale-105 text-lg">
+                Bắt Đầu Ngay
+            </button>
+        </div>
+
+        <!-- Màn hình câu hỏi -->
+        <div id="quiz-screen" class="hidden card rounded-2xl shadow-2xl p-8 md:p-10">
+            <!-- Progress Bar -->
+            <div class="mb-6">
+                <div class="flex justify-between items-center mb-2">
+                    <span id="question-counter" class="text-sm font-semibold text-blue-600"></span>
+                    <span class="text-sm font-semibold text-slate-500">Tiến độ</span>
+                </div>
+                <div class="w-full bg-slate-200 rounded-full h-2.5">
+                    <div id="progress-bar" class="bg-gradient-to-r from-sky-400 to-blue-500 h-2.5 rounded-full progress-bar-inner"></div>
+                </div>
+            </div>
+            
+            <!-- Câu hỏi và trả lời -->
+            <h2 id="question-text" class="text-xl md:text-2xl font-bold text-slate-800 mb-8 text-center"></h2>
+            <div id="answer-buttons" class="grid grid-cols-1 gap-4">
+                <!-- Các nút trả lời sẽ được chèn vào đây -->
+            </div>
+        </div>
+
+        <!-- Màn hình kết quả -->
+        <div id="result-screen" class="hidden card rounded-2xl shadow-2xl p-8 md:p-12 text-center">
+            <h2 class="text-3xl font-bold mb-4 text-blue-700">Kết Quả Của Bạn</h2>
+            <p id="result-suggestion" class="text-slate-600 mb-8 text-lg text-center"></p>
+            
+            <div id="results-container" class="space-y-4 text-left mb-8">
+                <!-- Thanh kết quả sẽ được chèn vào đây -->
+            </div>
+
+            <button id="restart-btn" class="bg-gradient-to-r from-slate-400 to-slate-500 text-white font-bold py-3 px-10 rounded-full shadow-lg hover:shadow-xl hover:from-slate-500 hover:to-slate-600 transition-all duration-300 transform hover:scale-105 text-lg">
+                Làm Lại Test
+            </button>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+
+</body>
+</html>
