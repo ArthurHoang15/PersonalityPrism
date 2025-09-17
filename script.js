@@ -21,7 +21,7 @@ const questions = [
             { text: "Sáng tạo: Luôn tìm kiếm những ý tưởng độc đáo, mới mẻ.", committee: "PR" },
             { text: "Linh hoạt: Thích ứng nhanh với sự thay đổi của môi trường.", committee: "EV" },
             { text: "Kỹ lưỡng: Chú ý đến từng chi tiết nhỏ, đảm bảo mọi thứ hoàn hảo.", committee: "FER" },
-            { text: "Logic: Suy nghĩ có hệ thống, giải quyết vấn đề bằng lý trí.", committee: "Tech" }
+            { text: "Phân tích: Giải quyết các vấn đề thực tiễn dựa trên dữ liệu và suy nghĩ logic.", committee: "Tech" }
         ]
     },
     {
@@ -31,7 +31,7 @@ const questions = [
             { text: "Người tạo một chiến dịch truyền thông được nhiều người biết đến.", committee: "PR" },
             { text: "Người tổ chức một sự kiện thành công tốt đẹp.", committee: "EV" },
             { text: "Người kiểm soát tài chính – đối ngoại của CLB vận hành ổn định.", committee: "FER" },
-            { text: "Người giải quyết các vấn đề kỹ thuật một cách trơn tru.", committee: "Tech" }
+            { text: "Người phát triển sản phẩm hoặc biến dữ liệu thô thành insight giá trị.", committee: "Tech" }
         ]
     },
     {
@@ -41,7 +41,7 @@ const questions = [
             { text: "Người đưa ra ý tưởng, tạo cảm hứng.", committee: "PR" },
             { text: "Người sắp xếp công việc, kiểm soát timeline.", committee: "EV" },
             { text: "Người đảm bảo tài chính và đối ngoại.", committee: "FER" },
-            { text: "Người xử lý kỹ thuật, công cụ hỗ trợ.", committee: "Tech" }
+            { text: "Người cung cấp giải pháp kỹ thuật, phát triển hệ công nghệ.", committee: "Tech" }
         ]
     },
     {
@@ -51,7 +51,7 @@ const questions = [
             { text: "Lên ý tưởng poster, quay video, viết caption truyền thông.", committee: "PR" },
             { text: "Viết kế hoạch chương trình, điều phối hoạt động.", committee: "EV" },
             { text: "Tìm nguồn tài trợ, quản lý chi phí, làm báo cáo tài chính.", committee: "FER" },
-            { text: "Chuẩn bị kỹ thuật, hỗ trợ công nghệ.", committee: "Tech" }
+            { text: "Xây dựng sản phẩm và phân tích dữ liệu để hỗ trợ công nghệ.", committee: "Tech" }
         ]
     },
     {
@@ -71,7 +71,7 @@ const questions = [
             { text: "Viết nội dung, làm slide đẹp.", committee: "PR" },
             { text: "Chuẩn bị hậu cần cho buổi thuyết trình.", committee: "EV" },
             { text: "Đại diện nhóm, làm việc với giảng viên hoặc thuyết trình chính.", committee: "FER" },
-            { text: "Code, thiết kế hay xử lý kỹ thuật.", committee: "Tech" }
+            { text: "Lập trình, phân tích hệ thống hoặc biến những bộ dữ liệu phức tạp trở nên ý nghĩa.", committee: "Tech" }
         ]
     },
     {
@@ -81,7 +81,7 @@ const questions = [
             { text: "Bài đăng của mình được viral.", committee: "PR" },
             { text: "Sự kiện dù đông người nhưng diễn ra vẫn trơn tru.", committee: "EV" },
             { text: "Deal thành công một gói tài trợ.", committee: "FER" },
-            { text: "Fix xong một bug khó.", committee: "Tech" }
+            { text: "Triển khai thành công một tính năng hoặc trực quan hóa dữ liệu phức tạp", committee: "Tech" }
         ]
     },
     {
@@ -91,7 +91,7 @@ const questions = [
             { text: "Được tự do thể hiện ý tưởng cá nhân và thấy nó được hiện thực hóa.", committee: "PR" },
             { text: "Nhìn thấy một kế hoạch được thực hiện một cách trơn tru và chỉn chu.", committee: "EV" },
             { text: "Đạt được những thỏa thuận có lợi và thấy sự phát triển tài chính vững mạnh.", committee: "FER" },
-            { text: "Được đắm mình vào những vấn đề hóc búa và tìm ra giải pháp tối ưu.", committee: "Tech" }
+            { text: "Được ứng dụng công nghệ để giải quyết vấn đề thực tiễn và nâng cao năng lực cộng đồng.", committee: "Tech" }
         ]
     }
 ];
@@ -110,7 +110,7 @@ const committeeInfo = {
     PR: { name: "Truyền thông (PR)", color: "bg-amber-500" },
     EV: { name: "Sự kiện (EV)", color: "bg-emerald-500" },
     FER: { name: "Đối ngoại (FER)", color: "bg-violet-500" },
-    Tech: { name: "Kỹ thuật (Tech)", color: "bg-sky-500" }
+    Tech: { name: "Chuyên môn (Tech)", color: "bg-sky-500" }
 };
 
 function startQuiz() {
