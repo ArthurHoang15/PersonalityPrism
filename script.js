@@ -27,71 +27,71 @@ const questions = [
     {
         question: "Bạn thấy tự hào nhất khi bạn là…",
         answers: [
-            { text: "Người hỗ trợ mọi người trong team cảm thấy thoải mái và gắn bó.", committee: "HR" },
-            { text: "Người tạo một chiến dịch truyền thông được nhiều người biết đến.", committee: "PR" },
             { text: "Người tổ chức một sự kiện thành công tốt đẹp.", committee: "EV" },
-            { text: "Người kiểm soát tài chính – đối ngoại của CLB vận hành ổn định.", committee: "FER" },
-            { text: "Người phát triển sản phẩm hoặc biến dữ liệu thô thành insight giá trị.", committee: "Tech" }
+            { text: "Người hỗ trợ mọi người trong team cảm thấy thoải mái và gắn bó.", committee: "HR" },
+            { text: "Người phát triển sản phẩm hoặc biến dữ liệu thô thành insight giá trị.", committee: "Tech" },
+            { text: "Người tạo một chiến dịch truyền thông được nhiều người biết đến.", committee: "PR" },
+            { text: "Người kiểm soát tài chính – đối ngoại của CLB vận hành ổn định.", committee: "FER" }
         ]
     },
     {
         question: "Nếu bạn là “mảnh ghép” trong đội nhóm, bạn sẽ là…",
         answers: [
-            { text: "Người kết nối và động viên mọi người.", committee: "HR" },
-            { text: "Người đưa ra ý tưởng, tạo cảm hứng.", committee: "PR" },
-            { text: "Người sắp xếp công việc, kiểm soát timeline.", committee: "EV" },
             { text: "Người đảm bảo tài chính và đối ngoại.", committee: "FER" },
-            { text: "Người cung cấp giải pháp kỹ thuật, phát triển hệ công nghệ.", committee: "Tech" }
+            { text: "Người sắp xếp công việc, kiểm soát timeline.", committee: "EV" },
+            { text: "Người đưa ra ý tưởng, tạo cảm hứng.", committee: "PR" },
+            { text: "Người cung cấp giải pháp kỹ thuật, phát triển công nghệ.", committee: "Tech" },
+            { text: "Người kết nối và động viên mọi người.", committee: "HR" }
         ]
     },
     {
         question: "Khi CLB chuẩn bị tổ chức một sự kiện lớn, bạn sẽ chủ động chọn làm gì?",
         answers: [
-            { text: "Kết nối thành viên, phân công nhiệm vụ, giữ tinh thần đội nhóm.", committee: "HR" },
             { text: "Lên ý tưởng poster, quay video, viết caption truyền thông.", committee: "PR" },
-            { text: "Viết kế hoạch chương trình, điều phối hoạt động.", committee: "EV" },
+            { text: "Xây dựng sản phẩm và phân tích dữ liệu để hỗ trợ công nghệ.", committee: "Tech" },
+            { text: "Kết nối thành viên, phân công nhiệm vụ, giữ tinh thần đội nhóm.", committee: "HR" },
             { text: "Tìm nguồn tài trợ, quản lý chi phí, làm báo cáo tài chính.", committee: "FER" },
-            { text: "Xây dựng sản phẩm và phân tích dữ liệu để hỗ trợ công nghệ.", committee: "Tech" }
+            { text: "Viết kế hoạch chương trình, điều phối hoạt động.", committee: "EV" }
         ]
     },
     {
         question: "Khi xảy ra bất đồng giữa các thành viên trong nhóm, bạn sẽ làm gì?",
         answers: [
+            { text: "Phân tích vấn đề một cách logic, dựa trên dữ liệu để ra quyết định khách quan.", committee: "Tech" },
+            { text: "Đưa ra lộ trình và các bước cụ thể để giải quyết vấn đề nhanh chóng.", committee: "EV" },
             { text: "Làm trung gian hòa giải, lắng nghe từ hai phía để tìm ra tiếng nói chung.", committee: "HR" },
             { text: "Đề xuất một giải pháp hoàn toàn mới, sáng tạo để cả hai bên cùng có lợi.", committee: "PR" },
-            { text: "Đưa ra lộ trình và các bước cụ thể để giải quyết vấn đề nhanh chóng.", committee: "EV" },
-            { text: "Phân tích thiệt hơn rõ ràng dựa trên ngân sách và nguồn lực hiện có.", committee: "FER" },
-            { text: "Phân tích vấn đề một cách logic, dựa trên dữ liệu để ra quyết định khách quan.", committee: "Tech" }
+            { text: "Phân tích thiệt hơn rõ ràng dựa trên ngân sách và nguồn lực hiện có.", committee: "FER" }
         ]
     },
     {
         question: "Khi làm bài tập nhóm, bạn thích đảm nhận vai trò nào nhất?",
         answers: [
-            { text: "Phân chia công việc, kết nối các thành viên.", committee: "HR" },
             { text: "Viết nội dung, làm slide đẹp.", committee: "PR" },
-            { text: "Chuẩn bị hậu cần cho buổi thuyết trình.", committee: "EV" },
             { text: "Đại diện nhóm, làm việc với giảng viên hoặc thuyết trình chính.", committee: "FER" },
-            { text: "Lập trình, phân tích hệ thống hoặc biến những bộ dữ liệu phức tạp trở nên ý nghĩa.", committee: "Tech" }
+            { text: "Phân chia công việc, kết nối các thành viên.", committee: "HR" },
+            { text: "Lập trình, phân tích hệ thống hoặc biến những bộ dữ liệu phức tạp trở nên ý nghĩa.", committee: "Tech" },
+            { text: "Chuẩn bị hậu cần cho buổi thuyết trình.", committee: "EV" }
         ]
     },
     {
         question: "Một kết quả khiến bạn hứng thú:",
         answers: [
-            { text: "Quản lý được một team đông người.", committee: "HR" },
-            { text: "Bài đăng của mình được viral.", committee: "PR" },
-            { text: "Sự kiện dù đông người nhưng diễn ra vẫn trơn tru.", committee: "EV" },
             { text: "Deal thành công một gói tài trợ.", committee: "FER" },
-            { text: "Triển khai thành công một tính năng hoặc trực quan hóa dữ liệu phức tạp", committee: "Tech" }
+            { text: "Triển khai thành công một tính năng hoặc trực quan hóa dữ liệu phức tạp", committee: "Tech" },
+            { text: "Sự kiện dù đông người nhưng diễn ra vẫn trơn tru.", committee: "EV" },
+            { text: "Quản lý được một team đông người.", committee: "HR" },
+            { text: "Bài đăng của mình được viral.", committee: "PR" }
         ]
     },
     {
         question: "Điều gì khiến bạn cảm thấy có động lực làm việc nhất?",
         answers: [
-            { text: "Môi trường hòa đồng, mọi người tin tưởng và giúp đỡ lẫn nhau.", committee: "HR" },
-            { text: "Được tự do thể hiện ý tưởng cá nhân và thấy nó được hiện thực hóa.", committee: "PR" },
-            { text: "Nhìn thấy một kế hoạch được thực hiện một cách trơn tru và chỉn chu.", committee: "EV" },
+            { text: "Được ứng dụng công nghệ để giải quyết vấn đề thực tiễn và nâng cao năng lực cộng đồng.", committee: "Tech" },
             { text: "Đạt được những thỏa thuận có lợi và thấy sự phát triển tài chính vững mạnh.", committee: "FER" },
-            { text: "Được ứng dụng công nghệ để giải quyết vấn đề thực tiễn và nâng cao năng lực cộng đồng.", committee: "Tech" }
+            { text: "Được tự do thể hiện ý tưởng cá nhân và thấy nó được hiện thực hóa.", committee: "PR" },
+            { text: "Môi trường hòa đồng, mọi người tin tưởng và giúp đỡ lẫn nhau.", committee: "HR" },
+            { text: "Nhìn thấy một kế hoạch được thực hiện một cách trơn tru và chỉn chu.", committee: "EV" }
         ]
     }
 ];
