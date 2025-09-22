@@ -136,7 +136,16 @@ function showQuestion() {
     currentQuestion.answers.forEach(answer => {
         const button = document.createElement('button');
         button.innerHTML = answer.text;
-        button.classList.add('answer-btn', 'w-full', 'p-4', 'text-left', 'bg-white', 'rounded-lg', 'border', 'border-slate-200', 'shadow-sm', 'hover:bg-blue-100', 'hover:border-blue-400', 'transition-all', 'duration-300', 'text-slate-700');
+        button.classList.add('answer-btn', 'w-full', 'p-4', 'text-left', 'bg-white', 'rounded-lg', 'border', 'border-slate-200', 'shadow-sm', 'transition-all', 'duration-300');
+        button.style.color = 'var(--bastille)';
+        button.addEventListener('mouseover', (e) => {
+            e.currentTarget.style.backgroundColor = 'var(--london-hue)';
+            e.currentTarget.style.borderColor = 'var(--butterfly-bush)';
+        });
+        button.addEventListener('mouseout', (e) => {
+            e.currentTarget.style.backgroundColor = 'white';
+            e.currentTarget.style.borderColor = '#e2e8f0'; // slate-200
+        });
         button.addEventListener('click', () => selectAnswer(answer.committee));
         answerButtons.appendChild(button);
     });
@@ -182,7 +191,7 @@ function showResults() {
 
     resultSuggestion.innerHTML = `
     Dựa trên câu trả lời của bạn, có vẻ bạn phù hợp nhất với<br>
-    <span class="font-bold text-blue-600 text-xl">Ban ${committeeInfo[bestFitCommittee].name}</span>
+    <span class="font-bold text-xl" style="color: var(--butterfly-bush);">Ban ${committeeInfo[bestFitCommittee].name}</span>
 `;
     
     const sortedCommittees = Object.keys(scores).sort((a, b) => scores[b] - scores[a]);
@@ -193,10 +202,10 @@ function showResults() {
         const resultElement = document.createElement('div');
         resultElement.innerHTML = `
             <div class="flex justify-between items-center mb-1">
-                <span class="font-semibold text-slate-700">${committeeInfo[committee].name}</span>
-                <span class="font-bold text-blue-600">${percentage}%</span>
+                <span class="font-semibold" style="color: var(--bastille);">${committeeInfo[committee].name}</span>
+                <span class="font-bold" style="color: var(--butterfly-bush);">${percentage}%</span>
             </div>
-            <div class="w-full bg-slate-200 rounded-full h-4">
+            <div class="w-full bg-gray-200 rounded-full h-4">
                 <div class="h-4 rounded-full result-bar" style="width: ${percentage}%; background-color: ${getCommitteeColor(committee)};"></div>
             </div>
         `;
@@ -206,11 +215,11 @@ function showResults() {
 
 function getCommitteeColor(committee) {
     const colors = {
-        HR: '#ef4444',   // red-500
-        PR: '#f59e0b',   // amber-500
-        EV: '#10b981',   // emerald-500
-        FER: '#8b5cf6',  // violet-500
-        Tech: '#3b82f6'  // blue-500
+        Tech: '#6453A7', // Butterfly Bush
+        FER: '#8A7DC6',  // Lighter variant
+        EV: '#ABAEE2',   // Cold Purple
+        PR: '#C0B6E8',  // Lighter variant
+        HR: '#D0B1D5'   // London Hue
     };
     return colors[committee] || '#64748b'; // slate-500
 }

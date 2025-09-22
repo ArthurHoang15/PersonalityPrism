@@ -1,10 +1,19 @@
+:root {
+    --butterfly-bush: #6453A7;
+    --london-hue: #D0B1D5;
+    --bastille: #141015;
+    --cold-purple: #ABAEE2;
+}
+
 body {
     font-family: 'Be Vietnam Pro', sans-serif;
+    background-color: var(--london-hue);
+    background-image: linear-gradient(to bottom right, var(--cold-purple), var(--london-hue));
 }
 .card {
-    background-color: rgba(255, 255, 255, 0.8);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    background-color: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     border: 1px solid rgba(255, 255, 255, 0.2);
 }
 .answer-btn:hover {
@@ -13,9 +22,9 @@ body {
 }
 .progress-bar-inner {
     transition: width 0.5s ease-in-out;
+    background: linear-gradient(to right, var(--butterfly-bush), var(--cold-purple), var(--london-hue));
 }
 .result-bar {
-    background-image: linear-gradient(to right, #60a5fa, #3b82f6);
     animation: grow 1s ease-out forwards;
     transform-origin: left;
 }
