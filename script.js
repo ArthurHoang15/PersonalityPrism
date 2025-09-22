@@ -139,8 +139,8 @@ function showQuestion() {
         button.classList.add('answer-btn', 'w-full', 'p-4', 'text-left', 'bg-white', 'rounded-lg', 'border', 'border-slate-200', 'shadow-sm', 'transition-all', 'duration-300');
         button.style.color = 'var(--bastille)';
         button.addEventListener('mouseover', (e) => {
-            e.currentTarget.style.backgroundColor = 'var(--london-hue)';
-            e.currentTarget.style.borderColor = 'var(--butterfly-bush)';
+            e.currentTarget.style.backgroundColor = '#F5F0F7';
+            e.currentTarget.style.borderColor = 'var(--london-hue)';
         });
         button.addEventListener('mouseout', (e) => {
             e.currentTarget.style.backgroundColor = 'white';
