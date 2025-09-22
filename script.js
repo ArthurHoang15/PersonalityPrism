@@ -2,7 +2,6 @@ const startScreen = document.getElementById('start-screen');
 const quizScreen = document.getElementById('quiz-screen');
 const resultScreen = document.getElementById('result-screen');
 const startBtn = document.getElementById('start-btn');
-const restartBtn = document.getElementById('restart-btn');
 
 const questionCounter = document.getElementById('question-counter');
 const progressBar = document.getElementById('progress-bar');
@@ -224,11 +223,4 @@ function getCommitteeColor(committee) {
     return colors[committee] || '#64748b'; // slate-500
 }
 
-function restartQuiz() {
-    resultScreen.classList.add('hidden');
-    startScreen.classList.remove('hidden');
-    startScreen.classList.add('fade-in');
-}
-
 startBtn.addEventListener('click', startQuiz);
-restartBtn.addEventListener('click', restartQuiz);
