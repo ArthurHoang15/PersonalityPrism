@@ -332,31 +332,59 @@ startBtn.addEventListener('click', startQuiz);
 		const baseSize = width < 480 ? 60 : (width < 768 ? 80 : 100);
 		pieces.length = 0;
 		
-		// Place pieces in symmetrical zig-zag pattern on left and right sides
-		const margin = baseSize + 30; // Distance from edges
-		const centerY = height / 2;
-		const verticalStep = height * 0.2; // Vertical distance between pieces
-		
-		const positions = [
-			// Left side - zig-zag pattern (top to bottom)
-			{ x: margin, y: centerY - verticalStep * 1.5 }, // Left top
-			{ x: margin + 200, y: centerY - verticalStep * 0.5 }, // Left middle-top (offset right)
-			{ x: margin, y: centerY + verticalStep * 0.5 }, // Left middle-bottom
-			{ x: margin + 200, y: centerY + verticalStep * 1.5 }, // Left bottom (offset right)
+		if (width < 1000) {
+			// Mobile layout: zig-zag horizontal pattern at 4 corners
+			const margin = 20; // Distance from edges
+			const cornerOffset = baseSize + 10; // Offset for zig-zag effect
 			
-			// Right side - mirrored zig-zag pattern (top to bottom)
-			{ x: width - margin - 200, y: centerY - verticalStep * 1.5 }, // Right top (offset left)
-			{ x: width - margin, y: centerY - verticalStep * 0.5 }, // Right middle-top
-			{ x: width - margin - 200, y: centerY + verticalStep * 0.5 }, // Right middle-bottom (offset left)
-			{ x: width - margin, y: centerY + verticalStep * 1.5 } // Right bottom
-		];
-		
-		for (let i = 0; i < images.length; i++) {
-			const img = images[i];
-			const pos = positions[i % positions.length];
-			const x = clamp(pos.x, baseSize, width - baseSize);
-			const y = clamp(pos.y, baseSize, height - baseSize);
-			pieces.push(createPiece(img, x, y, baseSize));
+			const positions = [
+				// Top corners - zig-zag horizontal
+				{ x: margin, y: margin }, // Top-left corner
+				{ x: margin + cornerOffset, y: margin + 150 }, // Top-left offset
+				{ x: width - margin - cornerOffset, y: margin + 150 }, // Top-right offset
+				{ x: width - margin, y: margin }, // Top-right corner
+				
+				// Bottom corners - zig-zag horizontal  
+				{ x: margin, y: height - margin }, // Bottom-left corner
+				{ x: margin + cornerOffset, y: height - margin - 150 }, // Bottom-left offset
+				{ x: width - margin - cornerOffset, y: height - margin - 150 }, // Bottom-right offset
+				{ x: width - margin, y: height - margin } // Bottom-right corner
+			];
+			
+			for (let i = 0; i < images.length; i++) {
+				const img = images[i];
+				const pos = positions[i % positions.length];
+				const x = clamp(pos.x, baseSize / 2, width - baseSize / 2);
+				const y = clamp(pos.y, baseSize / 2, height - baseSize / 2);
+				pieces.push(createPiece(img, x, y, baseSize));
+			}
+		} else {
+			// Desktop layout: original zig-zag pattern on left and right sides
+			const margin = baseSize + 30; // Distance from edges
+			const centerY = height / 2;
+			const verticalStep = height * 0.2; // Vertical distance between pieces
+			
+			const positions = [
+				// Left side - zig-zag pattern (top to bottom)
+				{ x: margin, y: centerY - verticalStep * 1.5 }, // Left top
+				{ x: margin + 200, y: centerY - verticalStep * 0.5 }, // Left middle-top (offset right)
+				{ x: margin, y: centerY + verticalStep * 0.5 }, // Left middle-bottom
+				{ x: margin + 200, y: centerY + verticalStep * 1.5 }, // Left bottom (offset right)
+				
+				// Right side - mirrored zig-zag pattern (top to bottom)
+				{ x: width - margin - 200, y: centerY - verticalStep * 1.5 }, // Right top (offset left)
+				{ x: width - margin, y: centerY - verticalStep * 0.5 }, // Right middle-top
+				{ x: width - margin - 200, y: centerY + verticalStep * 0.5 }, // Right middle-bottom (offset left)
+				{ x: width - margin, y: centerY + verticalStep * 1.5 } // Right bottom
+			];
+			
+			for (let i = 0; i < images.length; i++) {
+				const img = images[i];
+				const pos = positions[i % positions.length];
+				const x = clamp(pos.x, baseSize, width - baseSize);
+				const y = clamp(pos.y, baseSize, height - baseSize);
+				pieces.push(createPiece(img, x, y, baseSize));
+			}
 		}
 	}
 
