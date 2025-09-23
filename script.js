@@ -224,3 +224,324 @@ function getCommitteeColor(committee) {
 }
 
 startBtn.addEventListener('click', startQuiz);
+
+// ===== Floating draggable puzzle pieces background =====
+(function () {
+	const canvas = document.getElementById('bg-pieces-canvas');
+	if (!canvas) return;
+	const ctx = canvas.getContext('2d');
+	const container = document.getElementById('container');
+	let dpr = Math.max(1, window.devicePixelRatio || 1);
+	let width = 0, height = 0;
+
+	function resizeCanvas() {
+		width = Math.max(0, Math.floor(window.innerWidth));
+		height = Math.max(0, Math.floor(window.innerHeight));
+		dpr = Math.max(1, window.devicePixelRatio || 1);
+		canvas.style.width = width + 'px';
+		canvas.style.height = height + 'px';
+		canvas.width = Math.floor(width * dpr);
+		canvas.height = Math.floor(height * dpr);
+		ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+	}
+
+	resizeCanvas();
+	window.addEventListener('resize', resizeCanvas);
+
+	const imageSources = [
+		'assets/manhghep-1.png',
+		'assets/manhghep-2.png',
+		'assets/manhghep-3.png',
+		'assets/manhghep-4.png',
+	];
+
+	const images = [];
+	let imagesLoaded = 0;
+	imageSources.forEach(src => {
+		const img = new Image();
+		img.src = src;
+		img.onload = () => {
+			imagesLoaded++;
+			if (imagesLoaded === imageSources.length) init();
+		};
+		img.onerror = () => {
+			imagesLoaded++;
+			if (imagesLoaded === imageSources.length) init();
+		};
+		images.push(img);
+	});
+
+	const pieces = [];
+	const rand = (min, max) => Math.random() * (max - min) + min;
+	const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+
+	function createPiece(img, x, y, size) {
+		const aspect = img.naturalWidth && img.naturalHeight ? img.naturalWidth / img.naturalHeight : 1;
+		const w = size;
+		const h = size / aspect;
+		const radius = Math.max(16, Math.min(w, h) * 0.45);
+		return {
+			img,
+			x,
+			y,
+			w,
+			h,
+			r: radius,
+			vx: rand(-20, 20),
+			vy: rand(-10, 10),
+			ax: 0,
+			ay: 0,
+			angle: rand(-0.05, 0.05),
+			spin: rand(-0.001, 0.001),
+			isDragging: false,
+			grabOffsetX: 0,
+			grabOffsetY: 0,
+			lastPointerX: 0,
+			lastPointerY: 0,
+			lastMoveTime: 0
+		};
+	}
+
+	function getVisibleCardRect() {
+		const ids = ['start-screen', 'quiz-screen', 'result-screen'];
+		const containerRect = container.getBoundingClientRect();
+		let union = null;
+		for (const id of ids) {
+			const el = document.getElementById(id);
+			if (!el) continue;
+			if (el.classList && el.classList.contains('hidden')) continue;
+			const r = el.getBoundingClientRect();
+			const rel = { x: r.left - containerRect.left, y: r.top - containerRect.top, w: r.width, h: r.height };
+			if (!union) union = { ...rel };
+			else {
+				const minX = Math.min(union.x, rel.x);
+				const minY = Math.min(union.y, rel.y);
+				const maxX = Math.max(union.x + union.w, rel.x + rel.w);
+				const maxY = Math.max(union.y + union.h, rel.y + rel.h);
+				union = { x: minX, y: minY, w: maxX - minX, h: maxY - minY };
+			}
+		}
+		return union; // may be null
+	}
+
+	function initialLayout() {
+		const baseSize = width < 480 ? 60 : (width < 768 ? 80 : 100);
+		pieces.length = 0;
+		
+		// Place pieces on left and right sides of the background
+		const margin = baseSize + 30; // Distance from edges
+		const centerY = height / 2;
+		const verticalSpread = height * 0.25; // Spread vertically around center
+		
+		const positions = [
+			// Left side - top
+			{ x: margin, y: centerY - verticalSpread },
+			// Left side - bottom  
+			{ x: margin, y: centerY + verticalSpread },
+			// Right side - top
+			{ x: width - margin, y: centerY - verticalSpread },
+			// Right side - bottom
+			{ x: width - margin, y: centerY + verticalSpread }
+		];
+		
+		for (let i = 0; i < images.length; i++) {
+			const img = images[i];
+			const pos = positions[i % positions.length];
+			const x = clamp(pos.x, baseSize, width - baseSize);
+			const y = clamp(pos.y, baseSize, height - baseSize);
+			pieces.push(createPiece(img, x, y, baseSize));
+		}
+	}
+
+	function init() {
+		initialLayout();
+		startLoop();
+		attachInteractions();
+	}
+
+	let rafId = 0;
+	let lastTime = performance.now();
+
+	function startLoop() {
+		cancelAnimationFrame(rafId);
+		lastTime = performance.now();
+		renderLoop(lastTime);
+	}
+
+	function renderLoop(t) {
+		const dt = Math.min(0.033, Math.max(0.001, (t - lastTime) / 1000));
+		lastTime = t;
+		step(dt);
+		draw();
+		rafId = requestAnimationFrame(renderLoop);
+	}
+
+	function step(dt) {
+		// Subtle floating force
+		const floatStrength = 8; // px/s^2
+		const time = performance.now() * 0.001;
+		for (const p of pieces) {
+			if (p.isDragging) continue;
+			p.ax = Math.sin(time * 0.8 + p.x * 0.01) * 0.2 * floatStrength + rand(-1, 1);
+			p.ay = Math.cos(time * 0.6 + p.y * 0.01) * 0.2 * floatStrength + rand(-1, 1);
+			p.vx += p.ax * dt;
+			p.vy += p.ay * dt;
+			// Damping (air friction)
+			p.vx *= 0.995;
+			p.vy *= 0.995;
+			p.spin *= 0.999;
+			p.angle += p.spin;
+			p.x += p.vx * dt;
+			p.y += p.vy * dt;
+		}
+
+		// Boundary collisions
+		for (const p of pieces) {
+			const left = p.x - p.w / 2;
+			const right = p.x + p.w / 2;
+			const top = p.y - p.h / 2;
+			const bottom = p.y + p.h / 2;
+			let bounced = false;
+			if (left < 0) { p.x = p.w / 2; p.vx = Math.abs(p.vx) * 0.8; bounced = true; }
+			if (right > width) { p.x = width - p.w / 2; p.vx = -Math.abs(p.vx) * 0.8; bounced = true; }
+			if (top < 0) { p.y = p.h / 2; p.vy = Math.abs(p.vy) * 0.8; bounced = true; }
+			if (bottom > height) { p.y = height - p.h / 2; p.vy = -Math.abs(p.vy) * 0.8; bounced = true; }
+			if (bounced) p.spin += rand(-0.003, 0.003);
+		}
+
+		// Piece-piece collisions (approx circle)
+		for (let i = 0; i < pieces.length; i++) {
+			for (let j = i + 1; j < pieces.length; j++) {
+				resolveCollision(pieces[i], pieces[j]);
+			}
+		}
+	}
+
+	function resolveCollision(a, b) {
+		const dx = b.x - a.x;
+		const dy = b.y - a.y;
+		const dist2 = dx * dx + dy * dy;
+		const minDist = a.r + b.r;
+		if (dist2 === 0 || dist2 > minDist * minDist) return;
+		const dist = Math.sqrt(dist2) || 0.0001;
+		const nx = dx / dist;
+		const ny = dy / dist;
+		const overlap = minDist - dist;
+		// Separate
+		a.x -= nx * overlap * 0.5;
+		a.y -= ny * overlap * 0.5;
+		b.x += nx * overlap * 0.5;
+		b.y += ny * overlap * 0.5;
+		// Relative velocity along normal
+		const rvx = b.vx - a.vx;
+		const rvy = b.vy - a.vy;
+		const velAlongNormal = rvx * nx + rvy * ny;
+		if (velAlongNormal > 0) return;
+		const restitution = 0.8; // bounciness
+		const impulse = -(1 + restitution) * velAlongNormal * 0.5;
+		a.vx -= impulse * nx;
+		a.vy -= impulse * ny;
+		b.vx += impulse * nx;
+		b.vy += impulse * ny;
+		const spinJitter = 0.002;
+		a.spin += rand(-spinJitter, spinJitter);
+		b.spin += rand(-spinJitter, spinJitter);
+	}
+
+	function draw() {
+		ctx.clearRect(0, 0, width, height);
+		for (const p of pieces) {
+			ctx.save();
+			ctx.translate(p.x, p.y);
+			ctx.rotate(p.angle);
+			ctx.drawImage(p.img, -p.w / 2, -p.h / 2, p.w, p.h);
+			ctx.restore();
+		}
+	}
+
+	// Interactions
+	let activePointerId = null;
+	let grabbedPiece = null;
+
+	function getPointerPos(evt) {
+		const rect = canvas.getBoundingClientRect();
+		const clientX = evt.touches ? evt.touches[0].clientX : evt.clientX;
+		const clientY = evt.touches ? evt.touches[0].clientY : evt.clientY;
+		return { x: (clientX - rect.left), y: (clientY - rect.top) };
+	}
+
+	function hitTest(x, y) {
+		// From topmost piece
+		for (let i = pieces.length - 1; i >= 0; i--) {
+			const p = pieces[i];
+			const dx = x - p.x;
+			const dy = y - p.y;
+			if (dx * dx + dy * dy <= p.r * p.r) return p;
+		}
+		return null;
+	}
+
+	function onPointerDown(evt) {
+		// only handle if event targets the canvas area not covered by higher z elements
+		const pos = getPointerPos(evt);
+		const p = hitTest(pos.x, pos.y);
+		if (!p) return;
+		if (evt.cancelable) evt.preventDefault();
+		activePointerId = evt.pointerId || (evt.touches ? 0 : 0);
+		grabbedPiece = p;
+		p.isDragging = true;
+		p.grabOffsetX = pos.x - p.x;
+		p.grabOffsetY = pos.y - p.y;
+		p.lastPointerX = pos.x;
+		p.lastPointerY = pos.y;
+		p.lastMoveTime = performance.now();
+		// Bring to front
+		const idx = pieces.indexOf(p);
+		if (idx >= 0) { pieces.splice(idx, 1); pieces.push(p); }
+	}
+
+	function onPointerMove(evt) {
+		if (!grabbedPiece) return;
+		const pos = getPointerPos(evt);
+		if (evt.cancelable) evt.preventDefault();
+		const p = grabbedPiece;
+		const now = performance.now();
+		const dt = Math.max(0.001, (now - p.lastMoveTime) / 1000);
+		const targetX = pos.x - p.grabOffsetX;
+		const targetY = pos.y - p.grabOffsetY;
+		// Constrain inside
+		p.x = clamp(targetX, p.w / 2, width - p.w / 2);
+		p.y = clamp(targetY, p.h / 2, height - p.h / 2);
+		p.vx = (pos.x - p.lastPointerX) / dt * 0.8; // keep some inertia
+		p.vy = (pos.y - p.lastPointerY) / dt * 0.8;
+		p.lastPointerX = pos.x;
+		p.lastPointerY = pos.y;
+		p.lastMoveTime = now;
+	}
+
+	function onPointerUp(evt) {
+		if (!grabbedPiece) return;
+		if (evt.cancelable) evt.preventDefault();
+		grabbedPiece.isDragging = false;
+		grabbedPiece = null;
+		activePointerId = null;
+	}
+
+	function attachInteractions() {
+		// Pointer Events if available
+		if (window.PointerEvent) {
+			canvas.addEventListener('pointerdown', onPointerDown, { passive: false });
+			window.addEventListener('pointermove', onPointerMove, { passive: false });
+			window.addEventListener('pointerup', onPointerUp, { passive: false });
+			window.addEventListener('pointercancel', onPointerUp, { passive: false });
+		} else {
+			canvas.addEventListener('mousedown', onPointerDown, { passive: false });
+			window.addEventListener('mousemove', onPointerMove, { passive: false });
+			window.addEventListener('mouseup', onPointerUp, { passive: false });
+			canvas.addEventListener('touchstart', onPointerDown, { passive: false });
+			window.addEventListener('touchmove', onPointerMove, { passive: false });
+			window.addEventListener('touchend', onPointerUp, { passive: false });
+			window.addEventListener('touchcancel', onPointerUp, { passive: false });
+		}
+	}
+})();
