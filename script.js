@@ -383,20 +383,48 @@ startBtn.addEventListener('click', startQuiz);
 		rafId = requestAnimationFrame(renderLoop);
 	}
 
-	function step(dt) {
-		// Subtle floating force
-		const floatStrength = 8; // px/s^2
+	function applyFloatingEffect(dt) {
 		const time = performance.now() * 0.001;
+		
 		for (const p of pieces) {
 			if (p.isDragging) continue;
-			p.ax = Math.sin(time * 0.8 + p.x * 0.01) * 0.2 * floatStrength + rand(-1, 1);
-			p.ay = Math.cos(time * 0.6 + p.y * 0.01) * 0.2 * floatStrength + rand(-1, 1);
+			
+			// Tạo hiệu ứng nhún lên xuống nhẹ nhàng chỉ theo chiều dọc
+			const baseFrequency = 0.6; // Tần số chậm để chuyển động nhẹ nhàng
+			const pieceOffset = (p.x + p.y) * 0.008; // Offset nhỏ để tạo sự khác biệt giữa các mảnh
+			
+			// Chỉ chuyển động dọc (lên xuống)
+			const verticalFloat = Math.sin(time * baseFrequency + pieceOffset) * 8; // 8px amplitude
+			
+			// Áp dụng force chỉ cho trục Y
+			p.ay += verticalFloat;
+		}
+	}
+
+	function step(dt) {
+		// Reset acceleration
+		for (const p of pieces) {
+			if (!p.isDragging) {
+				p.ax = 0;
+				p.ay = 0;
+			}
+		}
+		
+		// Áp dụng hiệu ứng floating
+		applyFloatingEffect(dt);
+		
+		// Áp dụng vận tốc và damping
+		for (const p of pieces) {
+			if (p.isDragging) continue;
+			
 			p.vx += p.ax * dt;
 			p.vy += p.ay * dt;
-			// Damping (air friction)
-			p.vx *= 0.995;
-			p.vy *= 0.995;
-			p.spin *= 0.999;
+			
+			// Damping (giảm tốc độ dần)
+			p.vx *= 0.985;
+			p.vy *= 0.985;
+			p.spin *= 0.998;
+			
 			p.angle += p.spin;
 			p.x += p.vx * dt;
 			p.y += p.vy * dt;
