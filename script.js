@@ -253,6 +253,10 @@ startBtn.addEventListener('click', startQuiz);
 		'assets/manhghep-2.png',
 		'assets/manhghep-3.png',
 		'assets/manhghep-4.png',
+		'assets/manhghep-2.png',
+		'assets/manhghep-1.png',
+		'assets/manhghep-4.png',
+		'assets/manhghep-3.png',
 	];
 
 	const images = [];
@@ -328,20 +332,23 @@ startBtn.addEventListener('click', startQuiz);
 		const baseSize = width < 480 ? 60 : (width < 768 ? 80 : 100);
 		pieces.length = 0;
 		
-		// Place pieces on left and right sides of the background
+		// Place pieces in symmetrical zig-zag pattern on left and right sides
 		const margin = baseSize + 30; // Distance from edges
 		const centerY = height / 2;
-		const verticalSpread = height * 0.25; // Spread vertically around center
+		const verticalStep = height * 0.2; // Vertical distance between pieces
 		
 		const positions = [
-			// Left side - top
-			{ x: margin, y: centerY - verticalSpread },
-			// Left side - bottom  
-			{ x: margin, y: centerY + verticalSpread },
-			// Right side - top
-			{ x: width - margin, y: centerY - verticalSpread },
-			// Right side - bottom
-			{ x: width - margin, y: centerY + verticalSpread }
+			// Left side - zig-zag pattern (top to bottom)
+			{ x: margin, y: centerY - verticalStep * 1.5 }, // Left top
+			{ x: margin + 200, y: centerY - verticalStep * 0.5 }, // Left middle-top (offset right)
+			{ x: margin, y: centerY + verticalStep * 0.5 }, // Left middle-bottom
+			{ x: margin + 200, y: centerY + verticalStep * 1.5 }, // Left bottom (offset right)
+			
+			// Right side - mirrored zig-zag pattern (top to bottom)
+			{ x: width - margin - 200, y: centerY - verticalStep * 1.5 }, // Right top (offset left)
+			{ x: width - margin, y: centerY - verticalStep * 0.5 }, // Right middle-top
+			{ x: width - margin - 200, y: centerY + verticalStep * 0.5 }, // Right middle-bottom (offset left)
+			{ x: width - margin, y: centerY + verticalStep * 1.5 } // Right bottom
 		];
 		
 		for (let i = 0; i < images.length; i++) {
