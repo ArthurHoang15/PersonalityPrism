@@ -8,7 +8,26 @@
 body {
     font-family: 'Be Vietnam Pro', sans-serif;
     background-color: var(--london-hue);
-    background-image: linear-gradient(to bottom right, var(--cold-purple), var(--london-hue));
+    background-image: linear-gradient(to bottom right, #6240A5, #6843B5, #9D79DB, #A496E4, #A68AF1, #BEA5F1, #C7A9E0, #CFB3E1, #BA82DF, #C883CF);
+}
+.floating-bg-container {
+    position: relative;
+}
+#container {
+    position: relative;
+}
+#bg-pieces-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 0;
+    pointer-events: auto;
+}
+.card, header, footer {
+    position: relative;
+    z-index: 1;
 }
 .card {
     background-color: rgba(255, 255, 255, 0.6);

@@ -224,3 +224,387 @@ function getCommitteeColor(committee) {
 }
 
 startBtn.addEventListener('click', startQuiz);
+
+// ===== Floating draggable puzzle pieces background =====
+(function () {
+	const canvas = document.getElementById('bg-pieces-canvas');
+	if (!canvas) return;
+	const ctx = canvas.getContext('2d');
+	const container = document.getElementById('container');
+	let dpr = Math.max(1, window.devicePixelRatio || 1);
+	let width = 0, height = 0;
+
+	function resizeCanvas() {
+		width = Math.max(0, Math.floor(window.innerWidth));
+		height = Math.max(0, Math.floor(window.innerHeight));
+		dpr = Math.max(1, window.devicePixelRatio || 1);
+		canvas.style.width = width + 'px';
+		canvas.style.height = height + 'px';
+		canvas.width = Math.floor(width * dpr);
+		canvas.height = Math.floor(height * dpr);
+		ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+	}
+
+	resizeCanvas();
+	window.addEventListener('resize', resizeCanvas);
+
+	const imageSources = [
+		'assets/manhghep-1.png',
+		'assets/manhghep-2.png',
+		'assets/manhghep-3.png',
+		'assets/manhghep-4.png',
+		'assets/manhghep-2.png',
+		'assets/manhghep-1.png',
+		'assets/manhghep-4.png',
+		'assets/manhghep-3.png',
+	];
+
+	const images = [];
+	let imagesLoaded = 0;
+	imageSources.forEach(src => {
+		const img = new Image();
+		img.src = src;
+		img.onload = () => {
+			imagesLoaded++;
+			if (imagesLoaded === imageSources.length) init();
+		};
+		img.onerror = () => {
+			imagesLoaded++;
+			if (imagesLoaded === imageSources.length) init();
+		};
+		images.push(img);
+	});
+
+	const pieces = [];
+	const rand = (min, max) => Math.random() * (max - min) + min;
+	const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+
+	function createPiece(img, x, y, size) {
+		const aspect = img.naturalWidth && img.naturalHeight ? img.naturalWidth / img.naturalHeight : 1;
+		const w = size;
+		const h = size / aspect;
+		const radius = Math.max(16, Math.min(w, h) * 0.45);
+		return {
+			img,
+			x,
+			y,
+			w,
+			h,
+			r: radius,
+			vx: rand(-20, 20),
+			vy: rand(-10, 10),
+			ax: 0,
+			ay: 0,
+			angle: rand(-0.05, 0.05),
+			spin: rand(-0.001, 0.001),
+			isDragging: false,
+			grabOffsetX: 0,
+			grabOffsetY: 0,
+			lastPointerX: 0,
+			lastPointerY: 0,
+			lastMoveTime: 0
+		};
+	}
+
+	function getVisibleCardRect() {
+		const ids = ['start-screen', 'quiz-screen', 'result-screen'];
+		const containerRect = container.getBoundingClientRect();
+		let union = null;
+		for (const id of ids) {
+			const el = document.getElementById(id);
+			if (!el) continue;
+			if (el.classList && el.classList.contains('hidden')) continue;
+			const r = el.getBoundingClientRect();
+			const rel = { x: r.left - containerRect.left, y: r.top - containerRect.top, w: r.width, h: r.height };
+			if (!union) union = { ...rel };
+			else {
+				const minX = Math.min(union.x, rel.x);
+				const minY = Math.min(union.y, rel.y);
+				const maxX = Math.max(union.x + union.w, rel.x + rel.w);
+				const maxY = Math.max(union.y + union.h, rel.y + rel.h);
+				union = { x: minX, y: minY, w: maxX - minX, h: maxY - minY };
+			}
+		}
+		return union; // may be null
+	}
+
+	function initialLayout() {
+		const baseSize = width < 480 ? 60 : (width < 768 ? 80 : 100);
+		pieces.length = 0;
+		
+		if (width < 1000) {
+			// Mobile layout: zig-zag horizontal pattern at 4 corners
+			const margin = 20; // Distance from edges
+			const cornerOffset = baseSize + 10; // Offset for zig-zag effect
+			
+			const positions = [
+				// Top corners - zig-zag horizontal
+				{ x: margin, y: margin }, // Top-left corner
+				{ x: margin + cornerOffset, y: margin + 150 }, // Top-left offset
+				{ x: width - margin - cornerOffset, y: margin + 150 }, // Top-right offset
+				{ x: width - margin, y: margin }, // Top-right corner
+				
+				// Bottom corners - zig-zag horizontal  
+				{ x: margin, y: height - margin }, // Bottom-left corner
+				{ x: margin + cornerOffset, y: height - margin - 150 }, // Bottom-left offset
+				{ x: width - margin - cornerOffset, y: height - margin - 150 }, // Bottom-right offset
+				{ x: width - margin, y: height - margin } // Bottom-right corner
+			];
+			
+			for (let i = 0; i < images.length; i++) {
+				const img = images[i];
+				const pos = positions[i % positions.length];
+				const x = clamp(pos.x, baseSize / 2, width - baseSize / 2);
+				const y = clamp(pos.y, baseSize / 2, height - baseSize / 2);
+				pieces.push(createPiece(img, x, y, baseSize));
+			}
+		} else {
+			// Desktop layout: original zig-zag pattern on left and right sides
+			const margin = baseSize + 30; // Distance from edges
+			const centerY = height / 2;
+			const verticalStep = height * 0.2; // Vertical distance between pieces
+			
+			const positions = [
+				// Left side - zig-zag pattern (top to bottom)
+				{ x: margin, y: centerY - verticalStep * 1.5 }, // Left top
+				{ x: margin + 200, y: centerY - verticalStep * 0.5 }, // Left middle-top (offset right)
+				{ x: margin, y: centerY + verticalStep * 0.5 }, // Left middle-bottom
+				{ x: margin + 200, y: centerY + verticalStep * 1.5 }, // Left bottom (offset right)
+				
+				// Right side - mirrored zig-zag pattern (top to bottom)
+				{ x: width - margin - 200, y: centerY - verticalStep * 1.5 }, // Right top (offset left)
+				{ x: width - margin, y: centerY - verticalStep * 0.5 }, // Right middle-top
+				{ x: width - margin - 200, y: centerY + verticalStep * 0.5 }, // Right middle-bottom (offset left)
+				{ x: width - margin, y: centerY + verticalStep * 1.5 } // Right bottom
+			];
+			
+			for (let i = 0; i < images.length; i++) {
+				const img = images[i];
+				const pos = positions[i % positions.length];
+				const x = clamp(pos.x, baseSize, width - baseSize);
+				const y = clamp(pos.y, baseSize, height - baseSize);
+				pieces.push(createPiece(img, x, y, baseSize));
+			}
+		}
+	}
+
+	function init() {
+		initialLayout();
+		startLoop();
+		attachInteractions();
+	}
+
+	let rafId = 0;
+	let lastTime = performance.now();
+
+	function startLoop() {
+		cancelAnimationFrame(rafId);
+		lastTime = performance.now();
+		renderLoop(lastTime);
+	}
+
+	function renderLoop(t) {
+		const dt = Math.min(0.033, Math.max(0.001, (t - lastTime) / 1000));
+		lastTime = t;
+		step(dt);
+		draw();
+		rafId = requestAnimationFrame(renderLoop);
+	}
+
+	function applyFloatingEffect(dt) {
+		const time = performance.now() * 0.001;
+		
+		for (const p of pieces) {
+			if (p.isDragging) continue;
+			
+			// Tạo hiệu ứng nhún lên xuống nhẹ nhàng chỉ theo chiều dọc
+			const baseFrequency = 0.6; // Tần số chậm để chuyển động nhẹ nhàng
+			const pieceOffset = (p.x + p.y) * 0.008; // Offset nhỏ để tạo sự khác biệt giữa các mảnh
+			
+			// Chỉ chuyển động dọc (lên xuống)
+			const verticalFloat = Math.sin(time * baseFrequency + pieceOffset) * 8; // 8px amplitude
+			
+			// Áp dụng force chỉ cho trục Y
+			p.ay += verticalFloat;
+		}
+	}
+
+	function step(dt) {
+		// Reset acceleration
+		for (const p of pieces) {
+			if (!p.isDragging) {
+				p.ax = 0;
+				p.ay = 0;
+			}
+		}
+		
+		// Áp dụng hiệu ứng floating
+		applyFloatingEffect(dt);
+		
+		// Áp dụng vận tốc và damping
+		for (const p of pieces) {
+			if (p.isDragging) continue;
+			
+			p.vx += p.ax * dt;
+			p.vy += p.ay * dt;
+			
+			// Damping (giảm tốc độ dần)
+			p.vx *= 0.985;
+			p.vy *= 0.985;
+			p.spin *= 0.998;
+			
+			p.angle += p.spin;
+			p.x += p.vx * dt;
+			p.y += p.vy * dt;
+		}
+
+		// Boundary collisions
+		for (const p of pieces) {
+			const left = p.x - p.w / 2;
+			const right = p.x + p.w / 2;
+			const top = p.y - p.h / 2;
+			const bottom = p.y + p.h / 2;
+			let bounced = false;
+			if (left < 0) { p.x = p.w / 2; p.vx = Math.abs(p.vx) * 0.8; bounced = true; }
+			if (right > width) { p.x = width - p.w / 2; p.vx = -Math.abs(p.vx) * 0.8; bounced = true; }
+			if (top < 0) { p.y = p.h / 2; p.vy = Math.abs(p.vy) * 0.8; bounced = true; }
+			if (bottom > height) { p.y = height - p.h / 2; p.vy = -Math.abs(p.vy) * 0.8; bounced = true; }
+			if (bounced) p.spin += rand(-0.003, 0.003);
+		}
+
+		// Piece-piece collisions (approx circle)
+		for (let i = 0; i < pieces.length; i++) {
+			for (let j = i + 1; j < pieces.length; j++) {
+				resolveCollision(pieces[i], pieces[j]);
+			}
+		}
+	}
+
+	function resolveCollision(a, b) {
+		const dx = b.x - a.x;
+		const dy = b.y - a.y;
+		const dist2 = dx * dx + dy * dy;
+		const minDist = a.r + b.r;
+		if (dist2 === 0 || dist2 > minDist * minDist) return;
+		const dist = Math.sqrt(dist2) || 0.0001;
+		const nx = dx / dist;
+		const ny = dy / dist;
+		const overlap = minDist - dist;
+		// Separate
+		a.x -= nx * overlap * 0.5;
+		a.y -= ny * overlap * 0.5;
+		b.x += nx * overlap * 0.5;
+		b.y += ny * overlap * 0.5;
+		// Relative velocity along normal
+		const rvx = b.vx - a.vx;
+		const rvy = b.vy - a.vy;
+		const velAlongNormal = rvx * nx + rvy * ny;
+		if (velAlongNormal > 0) return;
+		const restitution = 0.8; // bounciness
+		const impulse = -(1 + restitution) * velAlongNormal * 0.5;
+		a.vx -= impulse * nx;
+		a.vy -= impulse * ny;
+		b.vx += impulse * nx;
+		b.vy += impulse * ny;
+		const spinJitter = 0.002;
+		a.spin += rand(-spinJitter, spinJitter);
+		b.spin += rand(-spinJitter, spinJitter);
+	}
+
+	function draw() {
+		ctx.clearRect(0, 0, width, height);
+		for (const p of pieces) {
+			ctx.save();
+			ctx.translate(p.x, p.y);
+			ctx.rotate(p.angle);
+			ctx.drawImage(p.img, -p.w / 2, -p.h / 2, p.w, p.h);
+			ctx.restore();
+		}
+	}
+
+	// Interactions
+	let activePointerId = null;
+	let grabbedPiece = null;
+
+	function getPointerPos(evt) {
+		const rect = canvas.getBoundingClientRect();
+		const clientX = evt.touches ? evt.touches[0].clientX : evt.clientX;
+		const clientY = evt.touches ? evt.touches[0].clientY : evt.clientY;
+		return { x: (clientX - rect.left), y: (clientY - rect.top) };
+	}
+
+	function hitTest(x, y) {
+		// From topmost piece
+		for (let i = pieces.length - 1; i >= 0; i--) {
+			const p = pieces[i];
+			const dx = x - p.x;
+			const dy = y - p.y;
+			if (dx * dx + dy * dy <= p.r * p.r) return p;
+		}
+		return null;
+	}
+
+	function onPointerDown(evt) {
+		// only handle if event targets the canvas area not covered by higher z elements
+		const pos = getPointerPos(evt);
+		const p = hitTest(pos.x, pos.y);
+		if (!p) return;
+		if (evt.cancelable) evt.preventDefault();
+		activePointerId = evt.pointerId || (evt.touches ? 0 : 0);
+		grabbedPiece = p;
+		p.isDragging = true;
+		p.grabOffsetX = pos.x - p.x;
+		p.grabOffsetY = pos.y - p.y;
+		p.lastPointerX = pos.x;
+		p.lastPointerY = pos.y;
+		p.lastMoveTime = performance.now();
+		// Bring to front
+		const idx = pieces.indexOf(p);
+		if (idx >= 0) { pieces.splice(idx, 1); pieces.push(p); }
+	}
+
+	function onPointerMove(evt) {
+		if (!grabbedPiece) return;
+		const pos = getPointerPos(evt);
+		if (evt.cancelable) evt.preventDefault();
+		const p = grabbedPiece;
+		const now = performance.now();
+		const dt = Math.max(0.001, (now - p.lastMoveTime) / 1000);
+		const targetX = pos.x - p.grabOffsetX;
+		const targetY = pos.y - p.grabOffsetY;
+		// Constrain inside
+		p.x = clamp(targetX, p.w / 2, width - p.w / 2);
+		p.y = clamp(targetY, p.h / 2, height - p.h / 2);
+		p.vx = (pos.x - p.lastPointerX) / dt * 0.8; // keep some inertia
+		p.vy = (pos.y - p.lastPointerY) / dt * 0.8;
+		p.lastPointerX = pos.x;
+		p.lastPointerY = pos.y;
+		p.lastMoveTime = now;
+	}
+
+	function onPointerUp(evt) {
+		if (!grabbedPiece) return;
+		if (evt.cancelable) evt.preventDefault();
+		grabbedPiece.isDragging = false;
+		grabbedPiece = null;
+		activePointerId = null;
+	}
+
+	function attachInteractions() {
+		// Pointer Events if available
+		if (window.PointerEvent) {
+			canvas.addEventListener('pointerdown', onPointerDown, { passive: false });
+			window.addEventListener('pointermove', onPointerMove, { passive: false });
+			window.addEventListener('pointerup', onPointerUp, { passive: false });
+			window.addEventListener('pointercancel', onPointerUp, { passive: false });
+		} else {
+			canvas.addEventListener('mousedown', onPointerDown, { passive: false });
+			window.addEventListener('mousemove', onPointerMove, { passive: false });
+			window.addEventListener('mouseup', onPointerUp, { passive: false });
+			canvas.addEventListener('touchstart', onPointerDown, { passive: false });
+			window.addEventListener('touchmove', onPointerMove, { passive: false });
+			window.addEventListener('touchend', onPointerUp, { passive: false });
+			window.addEventListener('touchcancel', onPointerUp, { passive: false });
+		}
+	}
+})();
